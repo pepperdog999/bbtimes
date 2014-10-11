@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlGroup name="gallary">
+	<sql id="ownerGIndex">
+		select
+		c.infoStreamID,c.BatchID,c.infoStreamContent,c.DateCreated,c.UserID,c.UserName,
+		c.totalGrade,c.intCount,c.ncsCount
+	</sql>
+	<sql id="ownerGAttachment">
+		select
+		infoStreamID,BatchID,infoStreamContent,DateCreated,UserID,UserName,
+		totalGrade,intCount,ncsCount
+		from ns_infostream_content c
+		left join ns_infostream_index i on c.infoStreamID = i.infoStreamID
+		where i.UserID =?
+	</sql>
+	<sql id="getTimesYears">
+		select SUBSTR(c.DateCreated,1,4) date_year 
+		from ns_infostream_attachment ct
+		left join ns_infostream_content c on c.infoStreamID=ct.infoStreamID
+		where ct.AttachmentType=0 and c.UserID=?
+		group by SUBSTR(c.DateCreated,1,4)
+	</sql>
+	<sql id="getTimesMonth">
+		select SUBSTR(c.DateCreated,6,2) date_month 
+		from ns_infostream_attachment ct
+		left join ns_infostream_content c on c.infoStreamID=ct.infoStreamID
+		where ct.AttachmentType=0 and c.UserID=? and SUBSTR(c.DateCreated,1,4)=?
+		group by SUBSTR(c.DateCreated,6,2)
+		order by SUBSTR(c.DateCreated,6,2) Desc
+	</sql>
+	<sql id="getTimesPics">
+		SELECT ct.attachmentID imageID,c.infoStreamID,ct.Title,replace(ct.AttachmentContent,'detailImage','timeNoteImage') ImageURL
+		FROM ns_infostream_attachment ct
+		left join ns_infostream_content c on c.infoStreamID=ct.infoStreamID
+		WHERE  ct.AttachmentType=0 and c.UserID=? and SUBSTR(c.DateCreated,1,7)=?
+		order by c.DateCreated Desc
+		Limit 0,50
+	</sql>
+</sqlGroup>
+

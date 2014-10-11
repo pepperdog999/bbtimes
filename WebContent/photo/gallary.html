@@ -1,0 +1,97 @@
+<#assign i=1 />
+<#list gallary.getList() as item_index>
+<div class="list" id="${item_index.masterID}">
+	<span class="list-img"><a href=""><img
+			src="${resourceUrl}${item_index.UserID}${headerFix}"
+			onerror="javascript:this.src='../images/default_man.jpg'" /></a></span> <span
+		class="list-option _option" optionid="${item_index.masterID}"><i
+		class="icons" title="操作"></i></span>
+	<div class="list-c">
+		<div class="list-c-detail">
+			<div class="list-bar">
+				<span class="list-name"><a href="">${item_index.UserName}</a></span><font
+					class="list-time">${item_index.DateCreated}</font>
+					<#if (gallaryType=="Owner" && item_index.SourceInfoStreamID>0)>来自收藏</#if>
+			</div>
+			<div class="list-font">${item_index.infoStreamContent}</div>
+			<div class="list-pic" data-masterid="${item_index.masterID}">
+				<#if (item_index.images?size>1) >
+				<div class="list-pic-sim">
+					<#list item_index.images as images>
+						<#if i=1> 
+						<a class="_del" data-id="${images[1]}">
+						<img src="${resourceUrl}${images[3]}"
+						data-original="${resourceUrl}${images[3]}" class="lazy" /></a>
+						<#else>
+						<a class="_del" data-id="${images[1]}">
+						<img src="../images/grey.gif"
+						data-original="${resourceUrl}${images[3]}" class="lazy" /></a>
+						</#if>
+					</#list>
+				</div>
+				<#elseif (item_index.images?size=1) >
+					<#if i=1> 
+					<a class="_del" data-id="${item_index.images[0][1]}">
+					<img src="${resourceUrl}${item_index.images[0][3]}"
+					data-original="${resourceUrl}${item_index.images[0][3]}"
+					class="lazy" /></a>
+					<#else>
+					<a class="_del" data-id="${item_index.images[0][1]}">
+					<img src="../images/grey.gif"
+					data-original="${resourceUrl}${item_index.images[0][3]}"
+					class="lazy" /></a>
+					</#if>
+				</#if>
+			</div>
+			<div class="swichover-replay-kj list-links">
+				<a class="swichover-replay-kj-bc" hidefocus="true"><i
+					class="thumbIcons"></i>真的很喜欢<b>(0)</b></a>
+				<a class="swichover-replay-kj-pl" hidefocus="true"><i
+					class="thumbIcons"></i>回复<b>(${item_index.comments?size})</b></a>
+			</div>
+			<div class="list-line">
+				<i class="icons"></i>
+			</div>
+			<div class="list-replay" id="${item_index.masterID}-reply">
+				<#if (item_index.comments?size>0) > 
+				<#list item_index.comments as comments>
+				<div class="list-replayList">
+					<a class="list-RL-img"><img
+						src="${resourceUrl}${comments[2]}${headerFix}"
+						onerror="javascript:this.src='../images/default_man.jpg'" /></a>
+					<div class="list-RL-c">
+						<div class="list-RL-bar">
+							<span class="list-RL-name"><a href="">${comments[3]}:</a></span>
+							${comments[4]}
+						</div>
+						<div class="list-RL-time">${comments[5]}</div>
+					</div>
+				</div>
+				</#list> 
+				</#if>
+			</div>
+			<div class="list-yi">
+				<div class="list-yi-simple">
+					<input name="" type="text" value="我也说一句" />
+				</div>
+				<div class="list-yi-complex">
+					<div>
+						<textarea name="" cols="" rows=""></textarea>
+					</div>
+					<div class="list-yi-complex-btn">
+						<button class="submitbtn-sty BtnDeblockingStyle" onclick="replyByMasterID(this,'${item_index.masterID}')">发表</button>
+						<font><b>0</b>/<em>450</em></font>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="list-c-simple">
+			<div class="list-bar">
+				<----- <span class="list-name"><a href="">涂骏(涂哥)</a></span><font
+					class="list-time">今天-8：20</font> ---->
+			</div>
+		</div>
+	</div>
+</div>
+<#assign i=i+1 />
+</#list>

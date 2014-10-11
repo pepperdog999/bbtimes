@@ -1,0 +1,60 @@
+
+	<div class="mainMargin">
+    	<div class="relativeDiv banner-m">
+        	<div class="logo"></div>
+            <ul class="menu">
+            	<li id="photo"><a href="../photo/index">图片分享</a></li>
+                <li id="interact"><a href="../interact/index">互动交流</a></li>
+                <li><a href="">家校联系</a></li>
+                <li><a href="">好友管理</a></li>
+            </ul>
+            <div class="barper" id="barper"><img src="${resourceUrl}${userInfo[0].userID}${headerFix}" onerror="javascript:this.src='../images/default_man.jpg'" /><span></span>
+            	<div class="barper-tip">
+                	<h5><i></i></h5>
+                    <div class="barper-tip-con">
+                    	<p class="grade">${userInfo[0].DisplayName}</p>
+                        <p class="school">${userInfo[0].schoolName}</p>
+                        <a id="logout" class="barper-tip-btn">安全退出</a>
+                    </div>
+                </div>
+            </div>
+            <div class="search"><input name="" type="text" value="搜索我的朋友" autocomplete="off"/><button class="icons"></button></div>
+        </div>
+    </div>
+
+<script type="text/javascript">
+$(document).ready(function () {
+	setUserHeader();
+
+	var bannerType = "${type!}";
+	switch(bannerType)
+	{
+	case "photo":
+		$("#photo").attr("class","menu-check");
+	    break;
+	case "interact":
+	    $("#interact").attr("class","menu-check");
+	    break;
+	default:
+		$("#photo").attr("class","menu-check");
+	}
+	
+	$("#logout").click(function(){
+		window.location="../logout";
+	});
+});
+function setUserHeader(){
+	var inset = false;
+	$('#barper').hover(function(){
+		inset = true;
+		$(this).find('.barper-tip').show();
+	},function(){
+		var $this = $(this);
+		inset = false;
+		var fun = setTimeout(function(){
+			if(!inset) $this.find('.barper-tip').hide();
+			clearTimeout(fun);	
+		},1000);
+	});
+}
+</script>

@@ -1,0 +1,43 @@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<table width="100%" border="0" cellspacing="0" cellpadding="0" id="switchoverTable" oncontextmenu=self.event.returnValue=false onselectstart="return false">
+  <tr>
+    <td align="left" valign="top" class="swichover-left">
+		<div class="relativeDiv">
+        
+        		<a class="swichover-i-prev set" hidefocus="true" id="swichover-prev"><i class="thumbIcons"></i></a>
+                <a class="swichover-i-next set" hidefocus="true" id="swichover-next"><i class="thumbIcons"></i></a>
+                
+        		<div class="swichover-i-b set" onselectstart="return false;" hidefocus="true">
+        			<div class="swichover-i-h" id="silderImg"><img src=""/></div>	
+				</div>
+                
+                <div class="swichover-si-option">
+                    <div class="swichover-si-optionF"><a id="anticlockwise"><i class="anticlockwise"></i>逆时针旋转</a><a  id="clockwise"><i class="clockwise"></i>顺时针旋转</a></div>
+                    <div class="swichover-si-option-shadow"></div>
+                </div>
+                
+                <div class="swichover-si-sim" id="silder">
+                	<a class="swichover-si-simprev silder-prev" hidefocus="true"><i></i></a>
+                    <a class="swichover-si-simnext silder-next" hidefocus="true"><i></i></a>
+                    <div class="swichover-si-simUL-box silder-content">
+                        <ul class="swichover-si-simUL silder-move">
+                       	<#list batchImg as batchImg> 
+                        	<li id="${batchImg[0]}" detailSrc="${resourceUrl}${batchImg[3]}"><a hidefocus="true"><img src="${resourceUrl}${batchImg[2]}" /></a></li>
+					    </#list>
+                        </ul>
+                    </div>
+                </div>
+              
+              
+        </div>
+    </td>
+    <td align="left" valign="top" class="swichover-right">
+    <div class="swichover-replay" id="swichoverRight">     
+    </div>
+    </td>
+  </tr>
+</table>
+<script type="text/javascript" src="../scripts/switchover/switchover-silder.js"></script>
+<script type="text/javascript">
+	$('#silder').froSilder({defultNum:0});
+</script>

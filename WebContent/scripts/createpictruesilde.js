@@ -1,0 +1,288 @@
+// JavaScript Document
+function ImgAndCommentCallback(ID, masterID){
+	manageImg.load(ID,true);
+	$.ajax({
+			type:"GET",
+			async: true,
+			dataType:"html", 
+			url:"imageInfo",
+			data:{infoStreamID:ID, masterID: masterID},
+			success:function(data){
+				$('#swichoverRight').html(data);
+				setCommentHeight();	
+			}
+	});
+	
+}
+//设置框架高度
+function resetheight(){
+		var table = $("#switchoverTable");
+		var num = $("#thumbswitch").height();
+		table.css({height:num});
+		var defultNumberLeft =  70;
+		table.find('.set').css({height:num - defultNumberLeft});
+		$("#swichoverRight").css({height:num-36});
+		defultHeight = num - defultNumberLeft;//记录大图的最大化默认高度
+}
+
+/*
+	设置大图src position 小图列表
+*/
+var defultHeight;
+var manageImg = (function(){
+	
+	var insideDefine = {};
+	insideDefine.renderImgSrc = function(obj){
+		var originalImgSrc = $(obj).attr('detailSrc');
+		 if(originalImgSrc != null){
+			return originalImgSrc;
+		 }
+	}
+	
+	insideDefine.load = function(ID, setWise){
+		var o = $('#silderImg');
+		var c = $('#silder .silder-move').children();
+		var present = new Object();
+		var jug = false;
+		var loadSuccess = false;
+		if(arguments.length == 1){
+			setWise = ID;
+			insideDefine.resetImgPosition(o, defultHeight, setWise);
+			return false;
+		}
+		c.each(function(){
+			 if($(this).attr('id') == ID){
+			    $(this).siblings().removeClass('swichover-si-simCkeck');
+			    $(this).addClass('swichover-si-simCkeck');
+				present = $(this);
+				jug = true;
+				return false;
+			 }
+		});
+		 //设置大图路径
+		if(jug){
+			o.hide();
+			var thisImg = new Image();
+			thisImg.src = encodeURI(insideDefine.renderImgSrc(present));
+			o.html('');
+			o.append($(thisImg));
+			thisImg.onload = function complete(){
+				insideDefine.resetImgPosition(o, defultHeight, true);
+				o.show();
+				loadSuccess = true;
+			}
+			setTimeout(function(){thisImg.src=encodeURI(insideDefine.renderImgSrc(present));},300);
+			$(thisImg).bind('error',function(){
+				if(!loadSuccess){
+					o.hide(); 
+					console.log('加载失败!');
+				}
+			});
+			jug = false;
+		}
+	}
+	
+	insideDefine.resetImgPosition = function(o,defultHeight, setWise){
+		o.css({height:'auto',width:'auto'});
+		var w = o.width(),h = o.height();
+		if(setWise == false){
+			var temp = w;
+			w = h;
+			h = temp;
+		}
+		var defultW = 800;
+		var left, top;
+							 
+		if((w/h) >= 1) {
+			if( w > defultW ) {
+				w = defultW;
+			}
+			o.css({height:'auto',width:w});
+			w = o.width(),h = o.height();
+		}else{
+			if(h > defultHeight){
+				o.css({height:defultHeight,width:'auto'});
+				w = o.width(),h = o.height();
+			}else{
+				o.css({height:'auto',width:'auto'});
+				w = o.width(),h = o.height();
+			}
+		}
+		left = -w*0.5, top = -h*0.5;
+		o.css({'margin-left':left,'margin-top':top});
+	}
+	return insideDefine;
+})();
+/*
+	点击小图  展示大图 加切换效果
+*/
+				
+$.extend($.fn, {
+	thumb: function() {
+		thumb.init.apply(this, arguments);
+	}
+});
+//全局控制
+var miniframeH = 0;
+var iframePadd = 0;
+var thumb = $.extend({}, {
+
+	init: function(options, node){
+		var thumbInt = $.extend(true,{
+			intNumber:0,
+			miniframeheight:400,
+			iframepadding:20,
+			iframeUrl:'switchover.html'
+		},options||{});
+
+		if(!node) node = this;
+		
+		miniframeH = thumbInt.miniframeheight;
+		iframePadd = thumbInt.iframepadding;
+		
+		$(node).each(function(){
+			$(this).click(function(){
+				//初始化图片展示   确定点击对象为选择对象
+				var ID = $(this).attr('data-id');
+				var masterID;
+				var pare;
+				var className = 'list-pic';
+				var reg = new RegExp('(\\s|^)'+className+'(\\s|$)');		
+				if($(this).parent().attr('class').match(reg)){
+					pare=$(this).parent();
+				}else{
+					pare=$(this).parent().parent();
+				}
+				masterID = pare.attr('data-masterid');
+				
+				thumb.setBodyScroll(true);
+				
+				thumb.appendThumbShadow(thumbInt, node);
+				thumb.createThumb(thumbInt, node, ID, masterID);
+				return false;
+			});
+		})
+		return this;
+	},
+	setBodyScroll: function(shut){
+		if(shut){
+			$('body').css({overflow:'hidden'});
+			if($.browser.msie) $('html').css({overflow:'hidden'});
+		}else{
+			$('body').css({overflow:'auto'});
+			if($.browser.msie) $('html').css({overflow:'auto'});
+		}
+	},
+	
+	getHtml:function(){
+		var Html = "<div id=\"thumbswitch\">";
+		Html += "<div class=\"thumbMargin\">";
+		Html += "<div class=\"thumbConetnt\"></div>";
+		Html += "<a class=\"thumbClose\"><i class=\"thumbIcons\"></i></a>";
+    	Html +="</div>";
+		Html +="</div>";
+		return Html;
+	},
+	createThumb:function(thumbInt, node, ID, masterID){
+		var $window = $(window);
+		var windowW = $window.width();
+		var windowH = $window.height();
+		var scrollTop = $(document).scrollTop();
+		
+		var $body = $('body');
+		var w = $body.width();
+		var h = $body.height();	
+		
+		//body添加整体框架
+		$body.append(thumb.getHtml());	
+		
+		var thumbswitch = $('#thumbswitch');//框架对象
+		var thumbShadow = $('#thumbShadow');//遮罩对象
+		var thunmiframe = thumbswitch.find('.thumbConetnt');//包含内容框架
+		
+		$.ajax({
+			type:"GET",
+			async: true,
+			dataType:"html", 
+			url:"showSwitch",
+			data:{infoStreamID:ID, masterID: masterID},
+			success:function(data){
+					//插入页面DOM元素
+					thunmiframe.html(data);
+										
+					//设置包含内容框架高度
+					thumbswitch.css({height:windowH-thumbInt.iframepadding*2});
+					
+					var objW = thumbswitch.width();
+					var objH = thumbswitch.height();
+					
+					//设置框架位置
+					thumbswitch.css({width:windowW,top:(windowH-objH)*0.5 + scrollTop,left:0});
+					//设置内部高度
+					resetheight();
+					
+					//初始化大图IMG SRC   位置   小图列表样式 位置
+					ImgAndCommentCallback(ID, masterID);
+					
+					//重置高度
+					$window.resize(function(){
+						//设置包含内容框高度
+						if($window.height()-thumbInt.iframepadding*2 <= thumbInt.miniframeheight){
+							thunmiframe.css({height:thumbInt.miniframeheight});
+							//设置内部高度
+							resetheight();
+							setCommentHeight();//重置右边评论高度
+							
+							//设置框架位置
+							var newobjH = thumbswitch.height();
+							thumbswitch.css({width:$window.width(),top:thumbInt.iframepadding+scrollTop,left:0});
+						}else{
+							thunmiframe.css({height:$window.height()-thumbInt.iframepadding*2});
+							//设置内部高度
+							resetheight();
+							setCommentHeight();//重置右边评论高度
+							//设置框架位置
+							var newobjH = thumbswitch.height();
+							thumbswitch.css({width:$window.width(),top:($window.height()-newobjH)*0.5+scrollTop,left:0});
+						}
+						//设置遮罩层高宽
+						thumbShadow.css({width:$body.width(),height:$body.height()});
+						
+					});
+					
+					thumbswitch.find('.thumbClose').click(function(){
+						if(thumbShadow.length >= 1){
+							thumbShadow.remove();
+							thumbswitch.animate({opacity:0},'fast',function(){$(this).remove();});
+							thumb.setBodyScroll(false);
+						}
+					});
+					
+					
+			}
+		});	
+		
+	},
+	appendThumbShadow:function(thumbInt, node){
+		var s = thumb.createThumbShadow(thumbInt, node);
+		$('body').append(s);	
+	},
+	createThumbShadow:function(thumbInt, node){
+		var Shadow = document.createElement('div');
+		$(Shadow).attr('id','thumbShadow');
+		var w = $('body').width();
+		var h = $('body').height();
+		$(Shadow).css({
+			position:'absolute',
+			left:'0',
+			top:'0',
+			width:w,
+			height:h,
+			opacity:'.9',
+			'filter':'alpha(Opacity=90)',
+			'background-color':'#000',
+			'z-index':'8888'	
+		});
+		return $(Shadow);
+	}	
+})

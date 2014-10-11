@@ -1,0 +1,208 @@
+<!-- Start of UpImgdate_list -->
+<link href="../css/jquery-ui-1.10.3.custom.min.css" rel="Stylesheet" type="text/css" /> 
+<link href="../css/jquery.cropzoom.css" rel="Stylesheet" type="text/css" />
+<script type="text/javascript" src="../scripts/jquery.form.min.js"></script>
+<div id="UpImgdate_list">
+        
+     <div class="UpImgdate_main">
+             
+             <table width="100%" border="0" cellspacing="0" cellpadding="0">
+               <tr>
+                 <td align="left" valign="top" class="UpImgdate_main_l">
+                     <div class="UpImgdate_pad">
+                         
+                         <div class="UpImgdate_main_l_con">
+                         	 <form id="form_upload" enctype="multipart/form-data">
+                             	<div class="UpImgdate_main_l_tit">
+                             		<a class="UpImgdate_btn01"><i></i>本地照片<input id="fulFile" name="fulFile" type="file" /></a></div>
+                             </form>
+                             <div class="UpImgdate_arr"><span></span><font>您可以选择一张本地照片制作您的头像，请点击"本地照片"上传。</font></div>
+                             <div style="margin-top:10px">
+                                     <div id="crop_container" class="UpImgdate_cutBar">
+                                     	
+                                     </div>
+                                     <div class="UpImgdate_cutBtn"><a id="crop" class="UpImgdate_btn02">剪切</a><a id="restore" class="UpImgdate_btn03">复位</a></div>
+                             </div>
+                             
+                         </div>
+                     </div>
+                 </td>
+                 <td align="left" valign="top" class="UpImgdate_main_r">
+                     <div>
+                             <div class="UpImgdate_main_r_tit"><a class="UpImgdate_close Close"></a></div>
+                             <div class="UpImgdate_main_r_con">
+                                 <h4>图片预览</h4>
+                                 <div class="UpImgdate_imgBar"><div class="UpImgdate_imgInBar"><img src="" class="jcrop-preview" /></div></div>
+                                 <div class="UpImgdate_imgFont">150*150</div>
+                             </div>
+                     </div>
+                 </td>
+               </tr>
+             </table>
+             
+     </div>
+
+</div>
+<script type="text/javascript" src="../scripts/json2.js"></script>
+<script type="text/javascript" src="../scripts/jquery-ui-1.10.3.custom.min.js"></script>
+<script type="text/javascript" src="../scripts/jquery.cropzoom.js"></script>
+
+<script type="text/javascript">
+   	
+	$(document).ready(function () {
+		$("#fulFile").change(function() {
+			var fileInfo = $("#fulFile").val().split('.');
+	        var fileType=fileInfo[fileInfo.length-1].toLowerCase();
+	        if(fileType =='png' || fileType=='bmp' || fileType=='jpg' || fileType=='jpeg'){
+	        	$("#form_upload").ajaxSubmit({
+	                url: "../img/updateAvatar",
+	                type: "post",
+	                dataType: "json",
+	                resetForm: "true",
+	                beforeSubmit: function() {
+	                    $(".UpImgdate_main_l_tit").hide();
+	                },
+	                success: function(data) {
+	                    $(".UpImgdate_main_l_tit").show();
+	                    if(data.success){
+	                      	$(".jcrop-preview").attr("src","../"+data.url);
+	                      	imgInit("../"+data.url,data.imginfo.w,data.imginfo.h);
+	                    }
+	                },
+	                error: function(jqXHR, errorMsg, errorThrown) {
+	                	$(".UpImgdate_main_l_tit").show();
+	                    alert(errorMsg);
+	                }
+	            });	
+	        }else{
+	        	alert("请选择正确的图片格式！");
+	        	return;
+	        }
+		});
+        
+	});
+
+
+     //图片处理
+     var rw,rh,cropzoom;
+     var cansubmit=false;
+ 	 function imgInit(url,w,h) {
+ 		 //debugger;
+ 		  rw=w;
+ 		  rh=h;
+ 		  cropzoom = $('#crop_container').cropzoom({
+ 	            width:560,
+ 	            height:380,
+ 	            bgColor: '#CCC',
+ 	            enableRotation:false,
+ 	            enableZoom:true,
+ 	            zoomSteps:5,
+ 	            rotationSteps:10,
+ 	            selector:{        
+	              	centered:true,
+	                x:235,
+	                y:125,
+	                w:150,
+	                h:150,
+	                maxWidth:150,
+	                maxHeight:150,
+	                startWithOverlay: false,
+	                borderColor:'blue',
+	                borderColorHover:'red',
+	                onSelectorDrag:function(obj,image,selector){
+	            	     previewInit(image,selector);
+	                }
+ 	            },
+ 	            image:{
+ 	                source:url,
+ 	                width:w,
+ 	                height:h,
+ 	                minZoom:10,
+ 	                maxZoom:150,
+ 	                onZoom:function(obj,image,selector){
+ 	                	 previewInit(image,selector);
+ 	                },
+ 	                onImageDrag:function(obj,image,selector){
+ 	                	 previewInit(image,selector);                 	
+                    }
+ 	            }
+ 	        });
+ 	        cropzoom.setSelector(310,125,150,150,false);
+ 	        $('#crop').click(function(){ 
+ 	        	if(cansubmit){
+	 	            cropzoom.send('../img/cutImg','POST',{},function(data){
+	 	               if (data.result) {
+	 				   		alert("头像保存成功！");
+	 					    //CloseWindow();
+	 				   }
+	 	            });
+ 	        	}else{
+ 	        		alert("对不起,你选择的区域超出了图片,不能剪切！");
+ 	        	}
+ 	        });
+ 	        var op=cropzoom.getDataInfo().data('options');
+ 	        $('#restore').click(function(){
+ 	            $('.result').find('img').remove();
+ 	            $('.result').find('.txt').show()
+ 	            cropzoom.restore();
+ 	            previewInit(op.image,op.selector);
+ 	        })
+ 	       
+ 	        previewInit(op.image,op.selector);
+ 	    
+ 	}
+ 	//i 图片对象image  s选择框移动selector
+ 	
+ 	
+ 	function previewInit(i,s){
+ 	        $pcnt = $('.UpImgdate_imgBar .UpImgdate_imgInBar'),
+ 	        $pimg = $('.UpImgdate_imgBar .UpImgdate_imgInBar img'),
+ 	        xsize = $pcnt.width(),
+ 	        ysize = $pcnt.height();
+ 	        //当前图片相对原图的缩放比例
+ 	        var _t_=0.5;
+ 	        //图片的宽
+ 	        var w1=i.w==null?i.width:i.w;
+ 	        //图片的高
+ 	        var h1=i.h==null?i.height:i.h;
+ 	        //图片的横坐标
+ 	        var x1=i.posX==null?i.x:i.posX;
+ 	        //图片的纵坐标
+ 	        var y1=i.posY==null?i.y:i.posY;
+ 	        //图片的宽高比例
+ 	        var xr=w1/h1;
+ 	        //选择框的横坐标
+ 	        var selectorx=s.x;
+ 	        //选择框的纵坐标
+ 	        var selectory=s.y;
+ 	        //选择框相对图片的横坐标
+ 	        var x2=selectorx-x1;
+ 	        //选择框相对图片的纵坐标
+ 	        var y2=selectory-y1;
+ 	        
+ 	        if(i.width!=null&&i.height!=null){
+ 	        	w1=w1*_t_;
+ 	        	h1=w1/xr;
+ 	        	
+ 	        }
+ 	        canSubmit(w1,h1,x2,y2)
+     	    $pimg.css({
+ 	           width: Math.round(w1) + 'px',
+ 	           height: Math.round(h1) + 'px',
+ 	           marginLeft: -(x2) + 'px',
+ 	           marginTop: -(y2) + 'px'
+ 	         
+ 	        });
+ 	}
+ 	
+	function canSubmit(w1,h1,x2,y2){
+		if(x2<0||y2<0){
+			cansubmit=false;
+		}else if(x2>(w1-150)||y2>(h1-150)){
+			cansubmit=false;
+		}else cansubmit=true;
+		
+	}
+	
+</script>
+<!-- End of UpImgdate_list -->

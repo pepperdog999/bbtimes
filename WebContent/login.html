@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>宝贝时光-用户登录</title>
+<link href="css/login.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+<!-- Start of login -->
+<div class="login_box" oncontextmenu=self.event.returnValue=false onselectstart="return false">
+    <div class="logo"></div>
+    <div class="login_clear">
+        <div class="login_fl login_pic">
+        	<div class="login_smile"></div>
+            <div id="rollImgs" class="login_picList">
+            </div>
+        </div>
+        <div class="login_fl login_l" id="LoginBox">
+        	<form name="login_form" method="post" action="login" onsubmit="return validLoginInput();">
+                <div class="login_in">
+                	<h5 class="login_pub login_tit">账号登陆</h5>
+                    <div class="login_pub login_inp"><input type="text" name="username" id="username" class="login_input" value=""/><span>账户</span></div>
+                    <div class="login_pub login_inp"><input type="password" name="password" id="password" class="login_input" value="" /><span>密码</span></div>
+                    <div class="login_pub login_fontTip"><font id="tooltip"></font><span><a>忘记密码?</a>|<a>意见反馈</a></span></div>
+                    <div class="login_pub login_btn"><input type="submit" value="登录" id="loginSubmit" class="login_btnStyle"/><span class="login_remember" data-check="false"><i class="unChecked"></i>&nbsp;记住账号</span></div>
+          		</div>
+                <div class="login_down"><a class="apple_down" href="https://itunes.apple.com/cn/app/bao-bei-shi-guang-xiao-yuan-ban/id593378972?mt=8" target="_blank"><i></i>Apple</a><a class="android_down" href="http://www.ibbtimes.com/upload/download/Kindergarten.apk" target="_blank"><i></i>Android </a></div>                
+        	</form>
+        </div>
+    </div>
+</div>
+<!-- End of login -->
+<script type="text/javascript" src="scripts/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="scripts/login.js"></script>
+<script type="text/javascript">
+
+	$(document).ready(function () {
+		$(".login_remember").click(function() {
+			if($(".login_remember").attr("data-check")=="true"){
+				//$('#userName').attr("value","老用户账号");
+			}
+		});
+		
+		var msg='${msg?if_exists}';
+		if (msg.indexOf("$")<0){
+			$("#tooltip").html(msg);	
+		}
+	});
+	
+	rollImgs();
+	var rImgs = setInterval(rollImgs, 100000);	
+	
+	function rollImgs(){
+		$.getJSON(
+				"sns/getrollImgs",
+				{}, 
+				function(result) {
+					if (result != null) {
+						var Html="";
+						for (var i=0;i<40;i++){
+							if(result.data[i]!=null){
+								Html += "<span><img src=\'"+result.resourceUrl+result.data[i].ImageURL+"' onerror=\"javascript:this.src='images/loading.gif'\" /></span>";
+							}
+						}
+						$("#rollImgs").html(Html);
+					}
+			});
+	}
+	
+	function validLoginInput() {
+			var username = $('#username').val();
+			var pwd = $('#password').val();
+
+			if (username == null || username == '' || pwd == null || pwd == '') {
+				$("#tooltip").html('用户信息不能为空！');
+				return false;
+			}
+			return true;
+		}
+</script>
+</body>
+
+</html>

@@ -1,0 +1,74 @@
+body, div, dl, dt, dd, ul, li, h1, h2, h3, h4, h5, h6, pre, code, form, fieldset, legend, input, button, textarea, blockquote,p{
+    margin:0px;
+    padding:0px;
+	border:0px;
+}
+body{ overflow:auto; font-size:12px; background-color:#fff;text-align:center; background:url(../images/login/login_bg.jpg) no-repeat top center;background-size: cover;}
+*:focus { outline: none; }
+a img{ border:0px;}
+a{ text-decoration:none;}
+a:focus { -moz-outline-style: none; } /* IE不支持 */
+
+div{ text-align:left;}
+
+.login_box{ width:782px; margin:0 auto; margin-top:180px;}
+
+.logo{ background:url(../images/login/logo.png) no-repeat left; height:20px; margin-bottom:20px;}
+.login_clear{ clear:both; overflow:hidden; background-color:#FFF;}
+.login_fl{ float:left;}
+.login_pic{ background-color:#f4f4f4; width:392px; height:260px; padding:15px 30px; position:relative;}
+.login_pic span{ margin-right:1px; margin-bottom:1px; display:inline-block; vertical-align:middle; width:48px; height:48px; background:url(../images/loading.gif) no-repeat center; background-color:#FFF;}
+.login_pic span img{width:48px; height:48px;}
+
+.login_smile{ position:absolute; left:90px; top:15px; background:url(../images/login/smile.png) no-repeat; width:253px; height:248px;}
+.login_picList{}
+
+.login_l{ width:330px; padding-bottom:10px;}
+.login_in{ padding:25px 20px 10px 20px;}
+
+
+
+.login_pub{ margin-bottom:10px;}
+.login_fontTip{ font-size:12px; color:red; height:14px;}
+.login_fontTip font{ float:left;}
+.login_fontTip span{ float:right;color:#717171; margin-right:45px;}
+.login_fontTip span a{color:#717171; cursor:pointer;margin-left:5px; margin-right:5px; }
+.login_fontTip span a:hover{ color:#ffa320;}
+.login_input{ background-color:#FFF; border:1px solid #dfdfdf;-webkit-border-radius: 3px;-moz-border-radius: 3px;border-radius: 3px; font-size:12px; color:#cacaca; padding:8px 8px; width:220px;}
+.login_input:focus{ color:#666;}
+
+.login_inp{ position:relative;}
+.login_inp span{ position:absolute; z-index:1; left:12px; top:9px;color:#cacaca; font-size:12px;}
+.login_tit{ font-size:14px;font-family:"微软雅黑", "宋体"; margin-bottom:10px;}
+.login_btn{ margin-top:20px;}
+.login_btn span{ margin-left:50px; font-size:12px; color:#717171; cursor:pointer; display:inline-block; vertical-align:middle; margin-top:-5px;}
+.login_btn span i{ background:url(../images/login/radio_ico.png) no-repeat 0px 0px; font-size:0px; display:inline-block; vertical-align:middle; width:17px; height:17px;}
+.login_btn span i.unChecked{ background-position:-18px 0px;}
+
+.login_btnStyle{ background-color:#ffa320;-webkit-border-radius: 3px;-moz-border-radius: 3px;border-radius: 3px; font-size:16px; color:#FFF;font-family:"微软雅黑", "宋体"; text-align:center; height:35px; line-height:35px; width:100px; cursor:pointer; text-shadow:0px 1px 1px rgba(0, 0, 0, .3);
+-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .15)inset;
+-moz-box-shadow: 0 1px 1px rgba(0, 0, 0, .15)inset;
+box-shadow: 0 1px 1px rgba(0, 0, 0, .15)inset;
+}
+.login_btnStyle:hover{background-color:#fb9606;}
+
+.login_link{ margin-top:20px; font-size:12px; color:#717171;}
+.login_link a{color:#717171; margin-left:5px; margin-right:5px; cursor:pointer;}
+.login_link a:hover{ color:#ffa320;}
+
+.login_down{ margin-top:0px; padding-left:10px;}
+.login_down a{ margin-right:10px;-webkit-border-radius: 3px;-moz-border-radius: 3px;border-radius: 3px; cursor:pointer; display:inline-block; vertical-align:middle; width:140px; height:45px; line-height:45px; font-size:24px; color:#FFF; font-family:Arial, Helvetica, sans-serif; padding-left:10px;
+-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .15)inset;
+-moz-box-shadow: 0 1px 1px rgba(0, 0, 0, .15)inset;
+box-shadow: 0 1px 1px rgba(0, 0, 0, .15)inset;
+}
+.login_down a i{  margin-right:10px; background:url(../images/login/down_icon.png) no-repeat; width:37px; height:43px; display:inline-block; vertical-align:middle;}
+.login_down a.apple_down{ background-color:#afafaf;}
+.login_down a.apple_down:hover{ background-color:#559d0d;}
+.login_down a.apple_down i{ background-position:0px 0px;}
+.login_down a.android_down{background-color:#afafaf;}
+.login_down a.android_down i{ background-position:-37px 0px;}
+.login_down a.android_down:hover{ background-color:#288bb4;}
+
+
+

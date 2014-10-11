@@ -1,0 +1,218 @@
+<table width="100%" border="0" cellspacing="0" cellpadding="0" class="interMes-tab">
+  <tr>
+    <td align="left" valign="top" class="interMes-tabMiddle">
+        <div id="interMes-user">
+        <div id="interMes-userlistMove">
+        <ul class="interMes-ul" id="interMes-userList" data-single="true">
+        	<li data-id="243ed83c-cfb3-4aac-b564-7410cb4e0c3b" data-name="群发消息" onclick="getDialogue(this)"><span class="Massive"></span><p>群发消息</p></li>
+        	<#list interactUserList as users>
+            	 <li data-id="${users.AuthorID?if_exists}" data-name="${users.AuthorName?if_exists}" onclick="getDialogue(this)"><span><img src="${resourceUrl}${users.AuthorID?if_exists}${headerFix}"
+								onerror="javascript:this.src='../images/default_man.jpg'" /></span><p>${users.AuthorName?if_exists}</p></li>
+            </#list>
+        </ul>
+        </div>
+        </div>
+    </td>
+    <td align="left" valign="top" class="interMes-tabRight">
+        <div class="interMes-dialogue">
+                <div class="interMes-dialogue-l">                        
+                        <div class="interMes-dialogue-more"><a onclick="getMore(this)">---- 显示更多信息 ----</a></div>                        
+                        <div id="dialoge-content">
+                        </div>
+                </div>
+        </div>
+        <div class="interMes-textBox">
+	        <div class="interMes-textBox-ico"><a title="选择模板"></a></div>
+	        <textarea id="newDialogue" name="" cols="" rows="">写写我想说的话~~~~~</textarea>
+	        <div class="interMes-btnBox"><button onclick="addDialogue()" class="interMes-btn">发送消息</button></div>
+        </div>
+    </td>
+  </tr>
+</table>
+
+<script type="text/javascript">
+	
+	setChangeStyle("interMes-userList", "checkLi");
+	var userID = "${userID?if_exists}";
+	var rUserID = "";
+	var rUserName = "";
+	var nextDate ="";
+	var selectedUsers ="${selectedUsers?if_exists}";
+	
+	$(document).ready(function(){
+		if(selectedUsers.split(",").length>1){
+			$("#interMes-userList li").eq(0).click();
+		}else{
+			$("#interMes-userList li").each(function(index){
+				var id = $(this).attr("data-id");
+				if(id == selectedUsers){
+					$("#interMes-userList li").eq(index).click();
+				}
+			});
+	    }
+		
+		$("#interMes-user").jscroll();
+		
+		Date.prototype.Format = function (fmt) { //author: meizz 
+		    var o = {
+		        "M+": this.getMonth() + 1, //月份 
+		        "d+": this.getDate(), //日 
+		        "h+": this.getHours(), //小时 
+		        "m+": this.getMinutes(), //分 
+		        "s+": this.getSeconds(), //秒 
+		        "q+": Math.floor((this.getMonth() + 3) / 3), //季度 
+		        "S": this.getMilliseconds() //毫秒 
+		    };
+		    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+		    for (var k in o)
+		    if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+		    return fmt;
+		};
+		var lastDate = new Date().Format("yyyy-MM-dd").substr(0,7);
+		
+	})
+	
+	function addDialogue(){
+		if((rUserID=="243ed83c-cfb3-4aac-b564-7410cb4e0c3b" && selectedUsers=="") || rUserID==""){
+			//$('#inforBox').load('../interact/addressBook');
+			$('#interMes-menu').children().eq(1).click();
+		}else{
+			var photoURL="${resourceUrl}"+userID+"${headerFix}";
+			var d = new Date().Format("yyyy-MM-dd hh:mm:ss");
+			var nowDate = d.substr(0,7);
+			var content = document.getElementById('newDialogue').value
+			$.getJSON("../interact/addDialogue", 
+				  {
+					RUserID : rUserID,
+					RUserName : rUserName,
+					SelectedUsers : selectedUsers,
+					Content : content
+				  }, 
+				  function(data) {
+					if (data.success) {
+						if (nowDate > lastDate){
+							var html='<div class="interMes-dialogue-b">';
+							html+='<div class="interMes-dia-time"><h1><b>'+nowDate.substr(5,2)+'</b>月</h1><p>'+nowDate.substr(0,4)+'</p></div>'
+							html+='<div class="interMes-dia-listTain">';
+							html+='<div class="interMes-dia-lit01">';
+							html+='<div class="interMes-dia-sendImg"><img src="'+photoURL+'" onerror="javascript:this.src=\'../images/default_man.jpg\'"/></div>';
+							html+='<div class="interMes-dia-gi"><i></i><span>'+d.substr(8,11)+'</span>'+content+'</div>';
+							html+='</div>';
+							html+='</div>';
+							html+='</div>';
+							$("#dialoge-content").append(html);
+							lastDate = nowDate;
+						}else{
+							html='<div class="interMes-dia-lit01">';
+							html+='<div class="interMes-dia-sendImg"><img src="'+photoURL+'" onerror="javascript:this.src=\'../images/default_man.jpg\'"/></div>';
+							html+='<div class="interMes-dia-gi"><i></i><span>'+d.substr(8,11)+'</span>'+content+'</div>';
+							html+='</div>';
+							$("#dialoge-content").find(".interMes-dia-listTain:last").append(html);
+						}
+						var sHeight= $(".interMes-dialogue-l").height();
+						$(".interMes-dialogue").scrollTop(sHeight);
+					}else{
+						alert(data.msg);
+					}
+						
+				  });
+		}
+	}
+	
+	function getMore(obj){
+		$.getJSON("../interact/getNextDialogueDateByUserID", 
+				  {
+					RUserID : rUserID,
+					NextDate : nextDate
+				  }, 
+				  function(data) {
+					if (data.success) {
+						nextDate=data.nextDate;
+						setDialogue(rUserID,data.nextDate.substr(0,4),data.nextDate.substr(5,2),'getMore');
+					}
+				  });
+	}
+	function getDialogue(obj){
+		rUserID=$(obj).attr("data-id");
+		rUserName=$(obj).attr("data-name");
+		$("#dialoge-content").html("");
+		$.getJSON("../interact/getLastDialogueDateByUserID", 
+				  {RUserID : rUserID}, 
+				  function(data) {
+					if (data.success) {
+						lastDate=data.lastDate;
+						nextDate=data.lastDate;
+						setDialogue(rUserID,data.lastDate.substr(0,4),data.lastDate.substr(5,2),'load');
+					}
+				  });
+	}
+	
+	function setDialogue(rUserID,year,month,type){
+		$.getJSON(
+				"../interact/getDialogueByUserID",
+				{	yearMonth : year+'-'+month,
+					RUserID: rUserID}, 
+				function(data) {
+					if (data.dialogueList.length >0) {
+						var photoURL="${resourceUrl}"+userID+"${headerFix}";
+						var html='<div class="interMes-dialogue-b">';
+						html+='<div class="interMes-dia-time"><h1><b>'+month+'</b>月</h1><p>'+year+'</p></div>'
+						html+='<div class="interMes-dia-listTain">';
+						for (var i =0;i < data.dialogueList.length;i++) {
+							if(data.dialogueList[i].iAuthorID==rUserID){
+								html+='<div class="interMes-dia-lit"><div class="interMes-dia-ko"><div class="interMes-dia-gi"><i></i><span>'+data.dialogueList[i].iDateCreated.substr(8,11)+'</span>'+data.dialogueList[i].iContent+'</div></div></div>';
+							}
+							else if(data.dialogueList[i].iAuthorID==userID){
+								html+='<div class="interMes-dia-lit01">';
+								html+='<div class="interMes-dia-sendImg"><img src="'+photoURL+'" onerror="javascript:this.src=\'../images/default_man.jpg\'"/></div>';
+								html+='<div class="interMes-dia-ko">';
+								html+='<div class="interMes-dia-gi"><i></i><span>'+data.dialogueList[i].iDateCreated.substr(8,11)+'</span>'+data.dialogueList[i].iContent+'</div>';
+								html+='<div class="interMes-dia-usersB">';
+								html+='<div class="interMes-dia-usersN"><a data-id="'+data.dialogueList[i].iMessageID+'" onclick="showSendUsers(this)" title="显示发送人员"></a></div>';
+								html+='<div class="interMes-dia-users"><div class="interMes-dia-usersOver"></div></div>';
+								html+='</div>';
+								html+='</div>';
+								html+='</div>';
+							}
+						}
+						html+='</div>';
+						html+='</div>';
+						$("#dialoge-content").prepend(html);
+						switch(type){
+						case 'load' :
+							var sHeight= $(".interMes-dialogue-l").height();
+							$(".interMes-dialogue").scrollTop(sHeight);
+							break;
+						case 'getMore' :
+							break;
+						default :
+							break;
+						}
+					}
+			});	
+	}
+	
+	function showSendUsers(obj){
+		var dataID = $(obj).attr("data-id");
+		if($(obj).attr("class")=="check"){
+			$(obj).removeClass("check");
+			$(obj).parent().parent().find(".interMes-dia-users").hide();
+		}else{
+			$.getJSON(
+					"../interact/getSendUserList",
+					{ DataID : dataID}, 
+					function(data) {
+						if (data.sendUserList.length >1) {
+							var html='';
+							for (var i=0;i<data.sendUserList.length;i++){
+								html +='<a>'+data.sendUserList[i].ReciveName+'</a>';	
+							}
+							$(obj).parent().parent().find(".interMes-dia-usersOver").html(html);
+							$(obj).addClass("check");
+							$(obj).parent().parent().find(".interMes-dia-users").show();	
+						}
+			});
+		}
+	}
+	
+</script>

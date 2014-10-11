@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlGroup name="interact">
+	<sql id="getInteractUserList">
+		select distinct AuthorID,AuthorName from
+		(select p.userID AuthorID,p.DisplayName AuthorName,now() lastDate
+	    from be_profiles p where p.userID in (?)
+	    union
+		select mi.AuthorID,mi.AuthorName,max(m.iDateCreated) lastDate
+		from ms_imessage_index mi 
+		left join ms_imessage_info m on m.iMessageID=mi.iMessageID
+		where mi.ReciveUserID=? and mi.AuthorID &lt;&gt; ? and m.iDataType=3
+		group by mi.AuthorID) d order by d.lastDate DESC		
+	</sql>
+	<sql id="getLastDialogueDateByUserID">
+		select substring(max(m.iDateCreated),1,7) lastDate
+		from ms_imessage_info m 
+		left join ms_imessage_index mi on mi.iMessageID = m.iMessageID
+		where m.iDataType=3 and ((mi.AuthorID=? and mi.ReciveUserID=?) or (mi.AuthorID=? and mi.ReciveUserID=?))
+	</sql>
+	<sql id="getNextDialogueDateByUserID">
+		select substring(max(m.iDateCreated),1,7) nextDate
+		from ms_imessage_info m 
+		left join ms_imessage_index mi on mi.iMessageID = m.iMessageID
+		where m.iDataType=3 and ((mi.AuthorID=? and mi.ReciveUserID=?) or (mi.AuthorID=? and mi.ReciveUserID=?)) and substring(m.iDateCreated,1,7) &lt; ?
+	</sql>
+	<sql id="getDialogueByUserID">
+		select distinct m.iMessageID,m.iAuthorID,m.iContent,m.iDateCreated 
+		from ms_imessage_info m 
+		left join ms_imessage_index mi on mi.iMessageID = m.iMessageID
+		where substring(m.iDateCreated,1,7)=? and m.iDataType=3 
+		and ((mi.AuthorID=? and mi.ReciveUserID=?) or (mi.AuthorID=? and mi.ReciveUserID=?))
+		order by m.iDateCreated
+	</sql>
+	<sql id="getSendUserList">
+		select i.ReciveUserID,i.ReciveName
+		from ms_imessage_index i
+		where i.iMessageID=? and (i.AuthorID=? and i.ReciveUserID &lt;&gt; ?)
+	</sql>
+</sqlGroup>
+

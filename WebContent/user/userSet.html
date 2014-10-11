@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>宝贝时光-个人设置</title>
+<link href="../css/css.css" type="text/css" rel="stylesheet" />
+<link href="../css/pub.css" type="text/css" rel="stylesheet" />
+<!--[if lte IE 8]>
+	<link rel="stylesheet" type="text/css" href="../css/IEcss.css" />
+<![endif]-->
+
+</head>
+
+<body>
+<div>
+<!-- Start of banner -->
+<div id="banner" class="banner">
+</div>
+<!-- End of banner -->
+
+<!-- Start of top -->
+<div class="optionB">
+	<div class="mainMargin">
+    	<div class="option">
+        	<span class="ti" style="display:none;"><a class="Btn">上传图片</a><font></font></span>
+            <span class="oi"><a><i class="icons icons-op01"></i>系统设置</a><a href="../user/index" target="_self"><i class="icons icons-op02"></i>个人信息</a></span>
+        </div>
+    </div>
+</div>
+<div class="line"></div>
+<!-- End of top -->
+
+
+<!-- Start of content -->
+<div class="content">
+	<div class="mainMargin">
+    		<div class="relativeDiv per">
+            	
+                <div class="perImg">
+                	<div class="perImg-b"><img id="userHeader" src="" onerror="javascript:this.src='../images/default_man.jpg'" /></div>
+                </div>
+                <div class="perImg-edit"><a id="editHeader">[编辑头像]</a></div>
+                <div class="perLineBox"><div class="perLine">个人资料设置</div></div>
+                <div class="perCon marginTop01">
+                	 <div class="perCon-bor">
+                         <h5 class="perTitle">密码修改</h5>
+                         <div>
+                           <div class="perPub"><code>原始密码：</code><input id="oldpwd" type="password" class="inputStyle01" style="width:200px;"/><span></span></div>
+                           <div class="perPub"><code>新密码：</code><input id="newpwd" type="password" class="inputStyle01" style="width:200px;"/><span></span></div>
+                           <div class="perPub"><code>确认密码：</code><input id="confirmpwd" type="password" class="inputStyle01" style="width:200px;"/><span></span></div>
+                         </div>
+                         <div class="perBtn-box"><button class="BtnDisable BtnDeblockingStyle" onclick="changePWD();">确认修改密码</button></div>
+                     </div>
+                     <div class="perCon-bor">
+                         <h5 class="perTitle">基础信息</h5>
+                         <div>
+                           <form id="userInfo" method="post">
+                           <div class="perPub"><code>用户账号：</code><em>${user.UserName}</em></div>
+                           <div class="perPub"><code>用户编号：</code><em>${user.ShortUID}</em></div>
+                           <div class="perPub"><code>所属学校：</code><input id="schoolInfo" type="text" disabled=true class="inputStyle01" style="width:200px;" value="" /></div>
+                           <div class="perPub"><code>默认组：</code>
+	                           <select id="defaultGroup">
+	                           </select>
+                           </div>
+                           <div display="none"><input type="hidden" name="bProfile.ProfileID" value="${profile.ProfileID}"></div>
+                           <div class="perPub"><code>性别：</code>
+	                           <select id="sexSelector" name="bProfile.SexID">
+	                             <option value="14" >男</option>
+	                             <option value="15" >女</option>
+	                           </select>
+                           </div>
+                           <div class="perPub"><code>昵称：</code><input name="bProfile.niCheng" type="text" class="inputStyle01" style="width:200px;" value="${profile.niCheng?if_exists}"/><span></span></div>
+                           <div class="perPub"><code>邮箱：</code><input name="bPorfile.emailAddress" type="text" class="inputStyle01" style="width:200px;" value="${profile.emailAddress?if_exists}"/><span></span></div>
+                           <div class="perPub"><code>签名：</code><textarea name="bProfile.aboutMe" cols="" rows="" class="textareaStyle01" style="width:400px;">${profile.aboutMe?if_exists}</textarea><span></span></div>
+                           </form>
+                         </div>
+                         <div class="perBtn-box"><button class="BtnDisable BtnDeblockingStyle" onclick="saveData();">确认修改个人信息</button></div>
+                     </div>
+                     
+                </div>
+                <div class="perCon-bor-mor">
+                	<p class="perCon-bor-mor01"></p>
+                    <p class="perCon-bor-mor02"></p>
+                    <p class="perCon-bor-mor03"></p>
+                    <p class="perCon-bor-mor04"></p>
+                </div>
+      </div>
+    </div>
+</div>
+<!-- End of content -->
+
+
+<!-- Start of footer -->
+<div id="footer" class="footer marginTop01">
+</div>
+<!-- End of footer -->
+</div>
+
+<script type="text/javascript" src="../scripts/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="../scripts/custom.js"></script>
+<script type="text/javascript" src="../scripts/dynamicLoad.js"></script>
+<script type="text/javascript" src="../scripts/userSet.js"></script>
+<script type="text/javascript" src="../scripts/upimg/upimg.js"></script>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#banner").load("../banner?Type=photo");
+	$("#footer").load("../footer");
+	$("#userHeader").attr("src","${resourceUrl}${user.UserID}${headerFix}"+"?rd="+new Date().valueOf());
+	$("#oldpwd").blur(function() {
+		var html='';
+		$.ajax({
+			type: "POST",
+			url:"../user/checkOldPwd",
+			dataType: "json",
+			data: {
+				userID : '${user.UserID}',
+				oldPwd : $("#oldpwd").val()
+				},
+			success: function(data){
+				if(data.result){
+					html='<i class=\"tips-icons true-icons\"></i>'+data.msg;
+					setTip($("#oldpwd"),html);
+				}else{
+					html='<i class=\"tips-icons error-icons\"></i>'+data.msg;
+					setTip($("#oldpwd"),html);
+				}					
+			}
+		});
+	});
+	$("#newpwd").blur(function() {
+		var html='';
+		if($("#newpwd").val()==''){
+			html='<i class=\"tips-icons warn-icons\"></i>新密码不能为空!';
+			setTip($("#newpwd"),html);
+		}else{
+			html='<i class=\"tips-icons true-icons\"></i>新密码输入正确!';
+			setTip($("#newpwd"),html);
+		}
+	});
+	$("#confirmpwd").blur(function() {
+		var html='';
+		if($("#confirmpwd").val()!=$("#newpwd").val()){
+			html='<i class=\"tips-icons error-icons\"></i>两次密码不一致!';
+			setTip($("#confirmpwd"),html);
+		}else{
+			html='<i class=\"tips-icons true-icons\"></i>确认密码输入正确!';
+			setTip($("#confirmpwd"),html);
+		}
+	});
+	$.getJSON("../user/getUserSchoolInfo", 
+			  {UserID : '${user.UserID}'}, 
+			  function(data) {
+				if (data != null) {
+					$('#schoolInfo').attr('value', data[0].schoolName);
+				}
+			  });
+	$.getJSON("../user/getUserGroups", 
+			  {UserID : '${user.UserID}'}, 
+			  function(data) {
+				if (data != null) {
+					for (var i=0;i<data.length;i++) {
+						$('#defaultGroup').append("<option value='"+data[i].gid+"'>"+data[i].gname+"</option>");
+					}
+					$("#defaultGroup").val("${user.defaultGroupID?if_exists}");
+				}
+			  });
+	$("#defaultGroup").change(function(){ 
+		$.ajax({
+			type: "POST",
+			url:"../user/setDefaultGroup",
+			dataType: "json",
+			data: {
+				UserID : '${user.UserID}',
+				gid:$("#defaultGroup").val()
+				},
+			success: function(data){
+				 if(data.success){
+				 	loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:data.msg});
+				 }
+			   }
+		});
+	}); 
+	$("#sexSelector").val("${profile.SexID?if_exists}");
+});	
+
+	function tipCallBack(){
+		try{
+			$(window).errTip({thumbWidth:450,thumbHeight:180,thumbTitle:this.thumbTitle,thumbContent:this.thumbContent});
+		}catch(err){
+		}
+	}
+	
+	function setTip(obj,msg){
+		obj.parent().find("span").empty();
+		obj.parent().find("span").html(msg);		
+	}
+	
+	function validate(){
+		return true;
+	}
+	
+	function changePWD() {
+		if($("#oldpwd").parent().find("i").attr("class")=='tips-icons true-icons' && $("#newpwd").parent().find("i").attr("class")=='tips-icons true-icons' && $("#confirmpwd").parent().find("i").attr("class")=='tips-icons true-icons'){
+			$.ajax({
+				type: "POST",
+				url:"../user/changePwd",
+				dataType: "json",
+				data: {
+					userID : '${user.UserID}',
+					oldPwd : $("#oldpwd").val(),
+					newPwd : $("#newpwd").val()
+					},
+				success: function(data){
+					if(data.result){
+						loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:'密码修改成功！'});
+					}else{
+						loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:'密码修改失败！'});
+					}					
+				}
+			});
+		}else{
+			loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:'密码信息不完整，请检查通过后重新提交修改！'});
+		}
+		
+	}
+	function saveData() {
+
+		if (validate() == false)
+		{
+			loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:'填写内容有误，请验证后重新保存！'});
+			return;
+		}
+		$.ajax({
+			url : "../user/update",
+			type : "post",
+			data : $("#userInfo").serialize(),
+			cache : false,
+			dataType : "json",
+			success : function(data) {
+				loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:data.msg});
+			},
+			error : function(jqXHR, textStatus, errorThrown) {
+				loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:jqXHR.responseText});
+			}
+		});
+	}
+	
+</script>
+</body>
+</html>

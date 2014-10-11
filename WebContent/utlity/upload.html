@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>宝贝时光-图片上传</title>
+<link href="../css/css.css" type="text/css" rel="stylesheet" />
+<link href="../css/pub.css" type="text/css" rel="stylesheet" />
+</head>
+
+<body>
+<div>
+<!-- Start of banner -->
+<div id="banner" class="banner">
+</div>
+<!-- End of banner -->
+
+<!-- Start of content -->
+<!-- Start of content -->
+<div class="content">
+	<div class="mainMargin">
+    
+    		<div class="marginTop upload-main">
+            	<div class="upload-tit" id="upload-choice">
+                	<label><input name="public_level" type="radio" value="" checked="checked" data-publicity="true"/> 公开</label>
+                  	<label><input name="public_level" type="radio" value=""  data-publicity="false"/> 指定人群</label>
+                    <input name="" type="hidden" value="" id="hiddenMemberData"/>
+                	<span class="upload-tit-font">【请指定图片发送的人群，默认为公开。】</span>
+                    
+                    <div class="upload-simpleListBox" id="upload-simpleList">
+                    	<div class="upload-simpleListTit"><a>[添加人员]</a><a>[全部删除]</a><font>(点击单个群组，可以重选成员)</font></div>
+                    	<div class="upload-simpleList"></div>
+                    </div>
+                    <div class="upload-tit-choicePer" id="upload-delList">
+                    	
+                        <div class="upload-silBox">
+                            <div class="upload-tit-choicePer-l" id="uploadGroupList">
+                            <#list userGroups as groups>
+                            	<div class="upload-tit-chlist" data-Array id="${groups.gid}"><a><em>${groups.gname}</em><i>已选(<b>0</b>)</i></a></div>
+							</#list>
+                            </div>
+                            <div class="upload-tit-choiceContent" oncontextmenu=self.event.returnValue=false onselectstart="return false"> 
+                            
+                                    <div class="upload-tit-contentclear" id="memberList" data-groupID="">
+                                    <!-- Start of list -->
+                                    <!-- End of list -->
+                                    </div>
+                                    
+                            </div>
+                        </div>
+                        <div class="upload-tit-contentAllChoice"><label><input name="" type="checkbox" id="selectAll" value=""/> 全选</label></div>
+                        <div class="upload-tit-contentBtn"><button class="BtnDeblockingStyle BtnDisable" onclick="closeUploadList(this, submitGroupLsit)" data-submit="true">确定</button><button class="BtnDisable" onclick="closeUploadList(this, submitGroupLsit)">取消</button></div>
+                    </div>
+                </div>
+                <div class="upload-gi">
+                <form id="form_upload" enctype="multipart/form-data">
+                	<div class="upload-kf">
+                		<div class="upload-kf-add">
+							<a class="Btn01 NewBtnstyle">
+		                		<i>晒晒最近的靓照！</i>
+								<input id="firstFile" name="firstFile" type="file" />  
+							</a>
+						</div>
+						<div class="upload-kf-load">
+							<img src="../images/loading-medium.gif"/>;
+						</div>             			
+                	</div>
+
+                    <div class="upload-ko">
+                    	<div class="upload-ko-del">                    	                        	
+                            <div id="imgList" class="upload-ko-clear">                        
+                                <div class="upload-ko-list upload-ko-list-add">
+                                	<div class="upload-ko-list-addb">
+                                    	<i class="upload-ko-list-addpic"></i>
+                                        <p>继续添加图片！</p>
+                                    </div>
+                                    <input id="extraFile" name="extraFile" type="file" />
+                                </div>
+                                <div class="upload-ko-list upload-ko-list-load">
+                                	<i class="upload-ko-list-loadpic"><img src="../images/loading-medium.gif"/></i>
+                                </div>
+                             </div>
+                        </div>
+                        <div class="upload-ko-op">
+                        	<span><a class="Btn01" href="javascript:submitContext();">开始上传</a></span>
+                        	<span></span>
+                        	<span id="picCount">共0张照片</span>
+                        </div>
+                    </div>
+                </form>
+                </div>
+            </div>
+    		            
+    </div>
+</div>
+<!-- End of content -->
+
+
+<!-- Start of footer -->
+<div id="footer" class="footer marginTop01">
+</div>
+<!-- End of footer -->
+</div>
+<script type="text/javascript" src="../scripts/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="../scripts/jquery.form.min.js"></script>
+<script type="text/javascript" src="../scripts/upload.js"></script>
+<script type="text/javascript" src="../scripts/dynamicLoad.js"></script>
+<script type="text/javascript">
+
+$(document).ready(function () {
+	$("#banner").load("../banner");
+	$("#footer").load("../footer");
+	$(".upload-kf").show();
+	$(".upload-kf-load").hide();
+	$(".upload-ko").hide();
+	
+	$("#firstFile").change(function() {
+		var fileInfo = $("#firstFile").val().split('.');
+        var fileType=fileInfo[fileInfo.length-1].toLowerCase();
+        if(fileType =='png' || fileType=='bmp' || fileType=='jpg' || fileType=='jpeg'){
+        	$("#form_upload").ajaxSubmit({
+                url: "../img/imgUpload",
+                type: "post",
+                dataType: "json",
+                resetForm: "true",
+                beforeSubmit: function() {
+                	var loadingHtml='<img style="margin-top:180px; position:relative; overflow:hidden;" src="../images/loading-medium.gif" alert="loading....."/>';
+                	if($(".upload-kf").is(":visible")){
+                		// $(".upload-kf").html(loadingHtml);//这样改变了div中的内容，导致file内容上传失败！
+                		$(".upload-kf-add").hide();
+                		$(".upload-kf-load").show();
+                	}
+                },
+                success: function(data) {
+                	if(data.success){
+                		addImg(data.orgName,data.picName,"../imgTemp/small/"+data.picName);
+                		$(".upload-kf").hide();
+                		$(".upload-ko").show();
+                		$(".upload-ko-list-load").hide();
+                	}else{
+                		loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:'图片上传失败！'});
+                	}
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                	loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:jqXHR.responseText});                }
+            });	
+        }else{
+        	loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:'请选择正确的图片格式！'});
+        	return;
+        }
+	});
+	
+	$("#extraFile").change(function() {
+		var fileInfo = $("#extraFile").val().split('.');
+        var fileType=fileInfo[fileInfo.length-1].toLowerCase();
+        if(fileType =='png' || fileType=='bmp' || fileType=='jpg' || fileType=='jpeg'){
+        	$("#form_upload").ajaxSubmit({
+                url: "../img/imgUpload",
+                type: "post",
+                dataType: "json",
+                resetForm: "true",
+                beforeSubmit: function() {              
+					$(".upload-ko-list-add").hide();
+					$(".upload-ko-list-load").show();
+                },
+                success: function(data) {
+                	if(data.success){
+                		addImg(data.orgName,data.picName,"../imgTemp/small/"+data.picName);
+                		$(".upload-ko-list-load").hide();
+                		$(".upload-ko-list-add").show();                		
+                	}else{
+                		loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:'图片上传失败！'});
+                	}
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                	loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:jqXHR.responseText});
+                }
+            });	
+        }else{
+        	loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:'请选择正确的图片格式！'});
+        	return;
+        }
+	});
+    
+});
+
+function tipCallBack(){
+	try{
+		$(window).errTip({thumbWidth:450,thumbHeight:180,thumbTitle:this.thumbTitle,thumbContent:this.thumbContent});
+	}catch(err){
+	}
+}
+
+function submitCallBack(){
+	try{
+		$(window).errTip({thumbWidth:450,thumbHeight:180,thumbTitle:this.thumbTitle,thumbContent:this.thumbContent,thumbCallBack:reload});
+	}catch(err){
+	}
+}
+
+var picCount=0;
+function addImg(orgName,picName,url){
+	var html='<div class="upload-ko-list">';
+	html+='<div id='+picName+' class="upload-ko-list-img">';
+	html+='<img src="'+url+'"/>';
+	html+='</div> <div class="upload-ko-list-option">';
+	html+='<i class="icons upload-delate" title="删除"></i>';
+	html+='<i class="icons upload-see" title="查看大图"></i>';
+	html+='</div><div class="upload-ko-list-name">';
+	html+='<input class="userDefineName" type="text" value="'+orgName+'"/></div></div>';
+	$("#imgList").prepend(html);
+	picCount++;
+	$("#picCount").html('共'+picCount+'张照片');
+	$('#imgList .upload-delate').bind('click',function(){
+		if($(this).parent().parent().attr('class') != 'upload-ko-list') return;
+		$(this).parent().parent().remove();
+		picCount--;
+		$("#picCount").html('共'+picCount+'张照片');
+	});
+	
+}
+
+
+function submitContext(){
+	var picArray = new Array();
+	var nameArray = new Array();
+	$('#imgList').find(".upload-ko-list-img").each(function(item){
+		picArray.push($(this).attr('id'));
+	});
+	$('#imgList').find(".userDefineName").each(function(item){
+		nameArray.push($(this).attr('value'));
+	});
+	if(picArray.length>0){
+		$.ajax({
+			type: "POST",
+			url:"../img/confirmSubmit",
+			dataType: "json",
+			data: {
+				picContext:picArray.toString(),
+				nameContext:nameArray.toString(),
+				selectedUsers:$('#hiddenMemberData').val()
+				},
+			beforeSend: function() {              
+				$(".Btn01").hide();
+                },
+			success: function(data){
+				$(".Btn01").show();
+				if(data.success){
+					loadjscssfile("../scripts/err/errTip.js", "js", submitCallBack,{thumbTitle:'操作提示',thumbContent:data.msg});
+				}
+			   }
+		});	
+	}else{
+		loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:'请先添加需要上传图片！'});
+	}
+	
+}
+
+function reload(){
+	window.location.reload();
+}
+</script>
+</body>
+</html>

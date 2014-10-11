@@ -1,0 +1,314 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>宝贝时光-相册</title>
+<link href="../css/css.css" type="text/css" rel="stylesheet" />
+<link href="../css/pub.css" type="text/css" rel="stylesheet" />
+
+</head>
+
+<body>
+<div>
+<!-- Start of banner -->
+<div id="banner" class="banner">
+</div>
+<!-- End of banner -->
+
+<!-- Start of top -->
+<div class="optionB">
+	<div class="mainMargin">
+    	<div class="option">
+        	<span class="ti"><a href="../photo/uploadPage" class="Btn">上传图片</a><font></font></span>
+            <span class="oi"><a><i class="icons icons-op01"></i>系统设置</a><a href="../user/index" target="_self"><i class="icons icons-op02"></i>个人信息</a></span>
+        </div>
+    </div>
+</div>
+<div class="line"></div>
+<!-- End of top -->
+
+
+<!-- Start of content -->
+<div class="content">
+	<div class="mainMargin">
+    		<table width="100%" border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td align="left" valign="top">
+                	<div class="group marginTop01" id="GroupsGather">
+                    	<span class="icons groupup"></span>
+                    	<ul>
+                        	<li class="group-check" id="Owner"><code>个人相册</code></li>                                           
+                            <li id="Class"><code>班级相册</code></li>
+                            <li id="School"><code>学校相册</code></li>
+                            <li id="Times"><code>时光相册</code></li>
+                        </ul>
+                    </div>
+                    <div class="marginTop groupChild-menu" id="groupChild-menu">
+                    <#list classInfo as classes>
+                    	<a data-id="${classes.ID}" >${classes.GROUPNAME}</a>
+                    </#list>
+                    </div>
+                <div id="gallaryContainer" class="marginTop01">
+                      
+                </div>
+                <div id="getMore" class="marginTop loadmore"><a gallaryType="getOwnerGallary" onclick="getMore(this)">更多图片……</a></div>
+                </td>
+                <td align="left" valign="top" class="rightFrame">
+                	<div class="marginTop01">
+               		  <h5 class="title">最近更新</h5>
+                            <div id="hotImgs" class="thom">
+                            
+                            </div>
+                    </div>
+                    <div class="marginTop01">
+                    		<h5 class="title">发图达人</h5>
+                            <div id="top10" class="thom">
+                            		
+                            </div>
+                    </div>
+                </td>
+              </tr>
+            </table>
+    </div>
+</div>
+<!-- End of content -->
+
+
+<!-- Start of footer -->
+<div id="footer" class="footer marginTop01">
+	
+</div>
+<!-- End of footer -->
+</div>
+<script type="text/javascript" src="../scripts/jquery-1.8.0.min.js"></script>
+<script type="text/javascript" src="../scripts/jquery.lazyload.js"></script>
+<script type="text/javascript" src="../scripts/custom.js"></script>
+<script type="text/javascript" src="../scripts/createpictruesilde.js"></script>
+<script type="text/javascript" src="../scripts/options/option.js"></script>
+<script type="text/javascript" src="../scripts/comment/setComment.js"></script>
+<script type="text/javascript" src="../scripts/layerFrame/layerFrame.js"></script>
+<script type="text/javascript" src="../scripts/index.js"></script>
+<script type="text/javascript" src="../scripts/tools.js"></script>
+<script type="text/javascript" src="../scripts/dynamicLoad.js"></script>
+
+<script type="text/javascript">
+		
+	hotImgs();
+	topUser();
+	var rhotImgs = setInterval(hotImgs, 300000);
+	var pageSize=5;
+
+	$(function() {
+		$("#banner").load("../banner?Type=photo");
+		loadData("getOwnerGallary",{},lazyLoad);
+		$("#footer").load("../footer");
+		$('#groupChild-menu a').each(function(item){
+			var did='${defaultGroupID}';
+			if ($(this).attr("data-id")==did)
+				$(this).attr("class","checked");
+		});
+	});
+
+	function lazyLoad(){
+		$("img.lazy").lazyload({effect : "fadeIn"});
+		$("._option").optioncontrol({jugupico:true, insetHtml:setHtml});
+		$('._del').thumb({intNumber:1});
+		replayListAddEvent();
+	}
+
+	function loadGallary(id)
+	{
+		$('#groupChild-menu').hide();
+		pageSize=5;
+		switch(id){
+			case 'Owner':
+				$("#getMore").find("a").attr("gallaryType","getOwnerGallary");
+				loadData("getOwnerGallary",{},lazyLoad);
+				break;
+			case 'Class':
+				$('#groupChild-menu').show();
+				$("#getMore").find("a").attr("gallaryType","getClassGallary");
+				ClassChoiceStyle();
+				break;
+			case 'School':
+				$("#getMore").find("a").attr("gallaryType","getSchoolGallary");
+				loadData("getSchoolGallary",{},lazyLoad);
+				break;
+			case 'Times':
+				window.location.href="showTimesGallary";
+			default:
+				loadData("getOwnerGallary",{},lazyLoad);
+		}	
+	}
+	
+	function tipCallBack(){
+		try{
+			$(window).errTip({thumbWidth:450,thumbHeight:180,thumbTitle:this.thumbTitle,thumbContent:this.thumbContent});
+		}catch(err){
+		}
+	}
+
+	function loadData(method,params,callback){
+		$("#gallaryContainer").load(method,params,callback);
+	}
+
+	function getMore(obj){
+		pageSize += 5;
+		var type=$(obj).attr("gallaryType");
+		if(type=="getClassGallary"){
+			var child = $('#groupChild-menu a');	
+			child.each(function(index){
+				if($(this).attr('class') == "checked"){
+					if($(this).attr('data-id') != null){
+						var thisID = $(this).attr('data-id');
+					}
+					loadData("getClassGallary",{pageSize:pageSize,classID:thisID},lazyLoad);
+				}	
+			});
+		}else{
+			loadData(type,{pageSize:pageSize},lazyLoad);	
+		}
+	}
+	
+	
+	function hotImgs(){
+		$.getJSON(
+				"../sns/getHotImgs",
+				{}, 
+				function(result) {
+					if (result != null) {
+						var Html = "<ul class=\"thom-ul\">";
+						for (var i=1;i<=9;i++){
+							if(result.data[i-1]!=null){
+								Html += "<li class=\"thom-ul-img\"><em>"+i+"</em><a data-id=\""+result.data[i-1].UserID+"\" class=\"_attention\"><img src=\""+result.resourceUrl+result.data[i-1].ImageURL+"\" /></a></li>";
+							}else{
+				        		Html += "<li><em>"+i+"</em></li>";
+							}
+						}
+						Html +="</ul>";
+						$("#hotImgs").html(Html);
+						$("._attention").optioncontrol({jugupico:true, insetHtml:attentionHtml,FrameWidth:270});
+					}
+			});
+	}
+	
+	function topUser(){
+		$.getJSON(
+				"../sns/getTopUser",
+				{}, 
+				function(result) {
+					if (result != null) {
+						console.log(result);
+						var Html = "<ul class=\"thin-ul\">";
+						for (var i=0;i<result.data.length;i++){
+							Html += "<li> <a class=\"thin-ul-img\"><img src=\""+result.resourceUrl+result.data[i].userID+result.headerFix+"\" onerror=\"javascript:this.src='../images/default_man.jpg'\"/></a>";
+							Html += "<span class=\"thin-ul-name\">"+result.data[i].DisplayName+"</span>";
+							Html += "<span class=\"thin-ul-class\">"+result.data[i].schoolName+"</span><a class=\"thin-ul-add _addGroup\">+加为好友</a></li>";
+						}
+						Html +="</ul>";
+						$("#top10").html(Html);
+						$("._addGroup").optioncontrol({jugupico:false, insetHtml:groupHtml});
+					}
+			});
+	}
+	
+	function delPhotoByMasterID(masterID){
+		var obj=document.getElementById(masterID);
+		$.ajax({
+			url:"../photo/delByMasterID",
+			data:{masterID:masterID},
+			dataType:"json",
+			success: function(data) {
+				if(data.result){
+					loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:'图片删除成功！'});
+					$(obj).remove();
+					$("#optionDiv").remove();
+				}else{
+					loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:'图片删除失败！'});
+				}
+			}
+		});
+	}
+	
+	function replyByMasterID(obj,masterID){
+		var replyContent=$(obj).parent().parent().find('textarea').val();
+		var objList=document.getElementById(masterID+'-reply');
+		var userID=readCookie("bb_usercookie", 0, "&");
+		var displayName = decodeURI(readCookie("bb_usercookie", 5, "&"));
+		var headerSrc = '${resourceUrl}'+userID+'${headerFix}';
+		$.ajax({
+			url:"../photo/replyByMasterID",
+			data:{
+				masterID : masterID,
+				userID : userID,
+				displayName : readCookie("bb_usercookie", 5, "&"),
+				replyContent : encodeURI(replyContent)
+				},
+			dataType:"json",
+			success:function(data){
+				if(data.result){
+					var intDay=GetDateDiff(data.time,(new Date()).pattern("yyyy-MM-dd hh:mm:ss"),"day");
+					var strDateDiffer=returnDateInterval(intDay,data.time);
+					var html=createRepalyList(headerSrc, displayName, replyContent, strDateDiffer);
+					$(objList).append(html);
+					loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:data.msg});
+					$(obj).parent().parent().find('textarea').val("");
+				}else{
+					loadjscssfile("../scripts/err/errTip.js", "js", tipCallBack,{thumbTitle:'操作提示',thumbContent:data.msg});
+				}
+			}
+		});
+	}
+	
+	function attentionHtml(){ //必须同步调用
+		var Html="";
+		$.ajax({
+			async: false,
+			url: "../user/getUserInfo",
+			data: {userID:$(this).attr('data-id')},
+			dataType: "json",
+			success: function(result) {
+				if (result != null) {
+					Html = "<div class=\"attention-b\">";
+					Html += "<div class=\"attention-clear\">";
+					Html += "<div class=\"attention-float attention-text\">";
+				    Html +=	"<p class=\"attention-name\">"+result.userInfo[0].DisplayName+"</p>";
+					Html += "<p class=\"attention-class\">学校：<font>"+result.userInfo[0].schoolName+"</font></p>";
+				    Html += "</div>";
+					Html += "<div class=\"attention-float attention-img\">";
+				    Html +=	"<img src=\""+result.resourceUrl+result.userInfo[0].userID+result.headerFix+"\" onerror=\"javascript:this.src='../images/default_man.jpg'\"/>";
+				    Html += "</div>";
+					Html += "</div>";
+				    Html += "<div class=\"attention-btn turngroupBtn\"><a class=\"sure\">看看TA的更新</a></div>";
+					Html += "</div>";
+					
+				}
+			}
+		});
+		return Html;
+	}
+	
+	function setHtml(){
+		var id= $(this).attr("optionid");
+		var Html = "<ul>";
+		Html +="<li><a hidefocus=\"true\">隐藏消息</a></li>  ";
+		Html +="<li><a hidefocus=\"true\" onclick=\"delPhotoByMasterID('"+id+"')\" >删除消息</a></li>";
+		Html +="<li><a hidefocus=\"true\">转发消息</a></li>";
+		Html +="</ul>";
+		return Html;
+	}
+
+	function groupHtml(){
+		var Html = "<ul>";
+		Html +="<li><a hidefocus=\"true\">班级同学</a></li>  ";
+		Html +="<li><a hidefocus=\"true\">老师</a></li>";
+		Html +="<li><a hidefocus=\"true\">好友</a></li>";
+		Html +="<li><a hidefocus=\"true\">闺蜜</a></li>";
+		Html +="</ul>";
+		return Html;
+	}
+</script>
+
+</body>
+</html>

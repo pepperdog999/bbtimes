@@ -1,0 +1,3 @@
+/* CSS Document */
+.pictureList-back{ display:none;position:absolute; width:180px; left:0px; bottom:0px; z-index:2;padding:5px 10px;background:#FFF;}
+.optionDiv-b{padding-top:10px; padding-bottom:10px; border:1px solid #dedede;background-color:#FFF;}

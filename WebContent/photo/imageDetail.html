@@ -1,0 +1,33 @@
+<div class="swichover-replay-i rightset">
+    <div class="swichover-replay-b">
+        <div class="swichover-replay-img"><a href="" hidefocus="true">
+        	<img src="${resourceUrl}${content.UserID}${headerFix}" onerror="javascript:this.src='../images/default_man.jpg'" /></a></div>
+        <div class="swichover-replay-font">
+            <div class="swichover-replay-name"><a href="" hidefocus="true">${content.UserName}</a></div>
+            <div class="swichover-replay-time">${content.DateCreated}</div>
+        </div>
+    </div>
+    <div class="swichover-replay-con">${content.infoStreamContent}&nbsp;${attachment.Title}</div>
+    <div class="swichover-replay-kj"><a class="swichover-replay-kj-bc" hidefocus="true"><i class="thumbIcons"></i>还不错哟<b>(3)</b></a><a class="swichover-replay-kj-z" hidefocus="true"><i class="thumbIcons"></i>真的很喜欢<b>(3)</b></a><a class="swichover-replay-kj-pl" hidefocus="true"><i class="thumbIcons"></i>评论</a><a class="swichover-replay-kj-sc" hidefocus="true"><i class="thumbIcons"></i>收藏</a></div>
+    <div class="swichover-replay-list marginTop" id="swichoverList">        
+    		<#list comments as comments>
+            <div class="swichover-replay-listpub">
+
+                    <div class="swichover-mainRe swichover-hover" data-tol="true">
+                        <div><code><a href="" hidefocus="true">${comments.C_USER_NAME}：</a></code>${comments.C_CONTENT}</div>
+                        <div class="arrow"><p>点击回复</p><span></span></div>
+                    </div>                    
+            </div>
+            </#list>
+    </div>
+</div>
+<div class="swichover-an" id="swichoverDialogMain">
+    <div class="swichover-an-f">
+            <div class="swichover-an-te"><textarea name="" cols="" rows="">我说一句</textarea></div>
+    </div>
+    <div class="swichover-an-b"><button class="Btn01 NewBtnstyle01">发表</button><span class="swichover-an-bf"><span>0</span>/<span>450</span></span></div>
+</div>
+<script type="text/javascript" src="../scripts/switchover/switchover.js"></script>
+<script type="text/javascript">
+	swichoverHover();
+</script>

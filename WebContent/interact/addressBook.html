@@ -1,0 +1,107 @@
+<table width="100%" border="0" cellspacing="0" cellpadding="0" class="interMes-tab">
+  <tr>
+    <td align="left" valign="top" class="interMes-tabMiddle">
+    
+    	<div class="interClassList">
+        	<div class="interClassList-move" id="userClass-move">
+            <table border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td align="left" valign="top" width="225">
+                		<ul class="interMes-ul" data-single="true" id="interMes-userClassList">
+                		<#list classInfo as class>
+			            	<li data-id="${class.ID}" data-name="${class.GROUPNAME}"><span><img src="${resourceUrl}${classHeaderFix?replace("[groupID]", class.ID)}"
+			            		onerror="javascript:this.src='../images/default_class.jpg'" /></span><p class="classFont">${class.GROUPNAME}</p></li>
+			            </#list>
+                        </ul>
+                </td>
+                <td align="left" valign="top" width="222">
+                	
+                    <div id="interMes-user">
+                        <div id="interMes-userlistMove">
+                        <div class="interMes-option"><span><a id="turnBackClass">返回班级</a></span><font id="allSelect" data-all="false">全部<i></i></font></div>
+                        	<ul class="interMes-ul" id="interMes-userList" data-single="false">
+                        	</ul>
+                        </div>
+                    </div>
+                </td>
+              </tr>
+            </table>
+        	</div>
+        </div>
+    </td>
+    <td align="left" valign="top" class="interMes-tabRight">
+    	<div class="ressMesTip"><p><b>先</b>选择列表的特定班级</p><p><b>再</b>选择班级人员发送消息</p></div>
+    	<div class="ressMes">
+        <div id="useInfo" class="ressMes-margin">
+        	
+        </div>
+        </div>
+        <div class="ressMes-more">
+        <div class="ressMes-margin">
+        	<h1><span><img src="../images/dialogue-big.png"/></span></h1>
+            <h2>多人发送</h2>
+            <div class="ressMes-d">
+            	<p><label>学校：</label>成都七中</p>
+                <p><label>班级：</label>桃花班</p>
+            </div>
+            <div><a class="Btn01 ressMesBtn" onclick="addMultiDialogue()">发送群消息</a></div>
+        </div>
+        </div>
+    </td>
+  </tr>
+</table>
+<script type="text/javascript">
+	setChangeStyle("interMes-userList", "checkLi");
+	setClassContent();
+	var className="";
+	
+	function getClassUser(ID,Name){
+		$.ajax({
+			url:"../user/getGroupUsers",
+			data:{groupID:ID},
+			success:function(data){
+				className=Name;
+				var html='';
+				var dataArray = data.data;
+				for (var i=0;i<dataArray.length;i++){
+					html+='<li data-id='+dataArray[i].userID+'><span><img src="'+"${resourceUrl}"+dataArray[i].userID+"${headerFix}"+'" onerror="javascript:this.src=\'../images/default_man.jpg\'" /></span><p>'+dataArray[i].DisplayName+'</p><font><i></i></font></li>';
+				}
+				$("#interMes-userList").html(html);
+				setChangeStyle("interMes-userList", "checkLi");
+				turnToClass();
+				setAllSelect();
+				$("#interMes-user").jscroll();
+			}
+		});
+	}
+	
+	function changeUser(userID,userName){
+		var html='';
+		html+='<h1><img src="'+"${resourceUrl}"+userID+"${headerFix}"+'" onerror="javascript:this.src=\'../images/default_man.jpg\'" /></h1>';
+        html+='<h2>'+userName+'</h2>';
+        html+='<div class="ressMes-d">';
+        html+='<p><label>班级：</label>'+ className +'</p>';
+        html+='</div>';
+        html+='<div><a class="Btn01 ressMesBtn" onclick="addOneDialogue();">发送消息</a></div>'
+        $("#useInfo").html(html);
+	}
+	
+	function addMultiDialogue(){
+		var selectedUsers="";
+		$("#interMes-userList li").each(function(index){
+			var id = $(this).attr("data-id");
+			var i = $(this).find("i");
+			if(i.hasClass("checked")){
+				selectedUsers += id+",";
+			}
+		});
+		$('#interMes-menu').children().eq(0).click();
+		$('#inforBox').load('../interact/messageList?SelectedUsers='+selectedUsers.substr(0,selectedUsers.length-1));
+	}
+	
+	function addOneDialogue(){
+		var selectedUser =$("#interMes-userList").find(".checked").parent().parent().attr("data-id");
+		$('#interMes-menu').children().eq(0).click();
+		$('#inforBox').load('../interact/messageList?SelectedUsers='+selectedUser);
+	}
+</script>

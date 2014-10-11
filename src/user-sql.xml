@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sqlGroup name="user">
+	<sql id="login">
+		SELECT u.UserID,u.UserName,ifNULL(p.DisplayName,u.UserName) DisplayName,u.UserSN,u.Password,r.RoleType,r.Note
+		,u.SchoolID,s.SchoolName
+		FROM be_users u
+		LEFT JOIN be_userroles ur ON ur.UserID=u.UserID
+		LEFT JOIN be_roles r ON r.RoleID=ur.RoleID
+		LEFT JOIN be_profiles p ON p.UserID=u.UserID
+		LEFT JOIN be_schoolinfo s ON s.SchoolID=u.SchoolID
+		WHERE r.RoleType &lt; 100 AND trim(u.UserSN)=? AND trim(u.Password)=?
+	</sql>
+	<sql id="getUserSchool">
+		select s.schoolID,s.schoolName
+		from be_users u
+		left join be_schoolInfo s on s.schoolID=u.schoolID
+		where u.userID=?
+	</sql>
+	<sql id="getUserClass">
+		select g.ID,g.GROUPNAME
+		from ms_group_con c
+		left join ms_group g on g.ID=c.GROUP_ID
+		where c.UID=?
+	</sql>
+	<sql id="getUserGroups">
+		select gc.GROUP_ID gid,g1.GROUPNAME gname
+		from ms_group_con gc 
+		left join ms_group g1 on gc.GROUP_ID=g1.ID
+		where gc.UID=?
+	</sql>
+	<sql id="getGroupUsers">
+		select gc.UID userID,p.DisplayName,r.Note userType
+		from ms_group_con gc
+		left join be_profiles p on p.userID=gc.UID
+		left join be_roles r on r.RoleType=gc.AUTH_TYPE
+		where gc.GROUP_ID=? and gc.UID not in (?)
+	</sql>
+	<sql id="getUserInfo">
+		select u.userID,u.userName,u.DisplayName,u.schoolID,u.schoolName
+		from view_userinfo u
+		where u.userID=?
+	</sql>
+</sqlGroup>
